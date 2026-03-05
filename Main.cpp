@@ -1,6 +1,9 @@
 #include <iostream>
+#include <vector>
+#include <stack>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
-
 
 void swap(int &a, int &b) {
     int temp = a;
@@ -8,50 +11,57 @@ void swap(int &a, int &b) {
     b = temp;
 }
 
-
-int partition(int arr[], int low, int high) {
+int partition(vector<int> &arr, int low, int high) {
     int pivot = arr[high]; 
-    int i = low - 1;       
+    int i = low - 1;
 
     for (int j = low; j < high; j++) {
-        if (arr[j] < pivot) { 
+        if (arr[j] < pivot) {
             i++;
             swap(arr[i], arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]); 
+    swap(arr[i + 1], arr[high]);
     return i + 1;
 }
 
 
-void quickSort(int arr[], int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);
+void quickSort(vector<int> &arr, int low, int high) {
+    stack<pair<int,int>> st;
+    st.push({low, high});
 
-     
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+    while (!st.empty()) {
+        auto [l, h] = st.top();
+        st.pop();
+
+        if (l < h) {
+            int pi = partition(arr, l, h);
+
+            // Push subarrays to stack
+            if (pi - 1 > l) st.push({l, pi - 1});
+            if (pi + 1 < h) st.push({pi + 1, h});
+        }
     }
 }
 
-
-void printArray(int arr[], int size) {
-    for (int i = 0; i < size; i++)
-        cout << arr[i] << " ";
-    cout << endl;
-}
-
 int main() {
-    int arr[] = {34, 7, 23, 32, 5, 62};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    int n = 10000000; // 10 million
+    vector<int> arr(n);
 
-    cout << "Original array: ";
-    printArray(arr, n);
+    srand(time(0));
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand(); // fill with random values
+    }
 
+    cout << "Sorting " << n << " values..." << endl;
     quickSort(arr, 0, n - 1);
+    cout << "Sorting complete!" << endl;
 
-    cout << "Sorted array: ";
-    printArray(arr, n);
+   
+    for (int i = 0; i < 20; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
 
     return 0;
 }
